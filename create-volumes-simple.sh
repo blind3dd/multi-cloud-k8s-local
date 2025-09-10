@@ -64,13 +64,22 @@ create_encrypted_volume() {
     echo "$passphrase" > "$volume_dir/$node_name.passphrase"
     chmod 600 "$volume_dir/$node_name.passphrase"
     
-    # Create encrypted sparse disk image
-    log "Creating encrypted sparse disk image..."
-    echo "$passphrase" | sudo hdiutil create -size "$VOLUME_SIZE" -type SPARSE -fs APFS -encryption AES-256 -stdinpass -volname "$node_name" "$disk_image"
+    # Check if volume already exists
+    if [ -f "$disk_image.sparseimage" ]; then
+        log "Volume $node_name already exists, skipping creation..."
+    else
+        # Create encrypted sparse disk image
+        log "Creating encrypted sparse disk image..."
+        echo "$passphrase" | sudo hdiutil create -size "$VOLUME_SIZE" -type SPARSE -fs APFS -encryption AES-256 -stdinpass -volname "$node_name" "$disk_image"
+    fi
     
     # Mount the encrypted volume
     log "Mounting encrypted volume..."
-    echo "$passphrase" | sudo hdiutil attach "$disk_image.sparseimage" -mountpoint "$mount_point" -stdinpass
+    if mount | grep -q "$mount_point"; then
+        log "Volume $node_name is already mounted at $mount_point"
+    else
+        echo "$passphrase" | sudo hdiutil attach "$disk_image.sparseimage" -mountpoint "$mount_point" -stdinpass
+    fi
     
     # Set ownership
     sudo chown -R "$(whoami):staff" "$mount_point"

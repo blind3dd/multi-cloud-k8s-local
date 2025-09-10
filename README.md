@@ -42,6 +42,8 @@ Volume A (AWS) → Simple Proxy (8000) → Volume B (Azure)
 ```
 multi-cloud-k8s-local/
 ├── README.md                           # This file
+├── QUICK_START.md                      # Quick start guide
+├── setup-main.sh                       # 🚀 MAIN SETUP SCRIPT (ONE COMMAND)
 ├── MULTI_CLOUD_K8S_SETUP_SUMMARY.md   # Detailed setup summary
 ├── create-volumes-simple.sh           # Create encrypted volumes
 ├── configure-volumes.sh               # Configure volumes with Nix
@@ -75,14 +77,28 @@ multi-cloud-k8s-local/
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### One-Command Setup
+
+**For the complete setup, run:**
+
+```bash
+./setup-main.sh
+```
+
+This single command orchestrates the entire infrastructure setup with detailed step descriptions.
+
+### Manual Setup (Alternative)
+
+If you prefer to run individual components:
+
+#### Prerequisites
 
 - macOS (tested on macOS 14.6.0)
 - Nix package manager installed
 - Root/sudo access for network operations
 - Python 3 for proxy server
 
-### 1. Create Encrypted Volumes
+#### 1. Create Encrypted Volumes
 
 ```bash
 sudo ./create-volumes-simple.sh
@@ -90,7 +106,7 @@ sudo ./create-volumes-simple.sh
 
 This creates 13 encrypted volumes representing different cloud providers.
 
-### 2. Configure Volumes
+#### 2. Configure Volumes
 
 ```bash
 sudo ./configure-volumes.sh
@@ -98,7 +114,7 @@ sudo ./configure-volumes.sh
 
 This configures each volume with Nix and Kubernetes tools.
 
-### 3. 🔄 Setup Proxy-Based Networking (KEY STEP)
+#### 3. 🔄 Setup Proxy-Based Networking (KEY STEP)
 
 ```bash
 sudo ./setup-simple-proxy.sh
@@ -107,7 +123,7 @@ sudo ./volumes/networking/proxy/manage-simple-proxy.sh start
 
 This sets up the **proxy server** for volume communication.
 
-### 4. Deploy CAPI
+#### 4. Deploy CAPI
 
 ```bash
 sudo ./deploy-capi-simple.sh
