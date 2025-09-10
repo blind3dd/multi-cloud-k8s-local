@@ -1,0 +1,57 @@
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  name: talos-cluster
+  namespace: default
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks: ["10.4.0.0/16"]
+    services:
+      cidrBlocks: ["10.5.0.0/16"]
+  controlPlaneRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    kind: TalosControlPlane
+    name: talos-control-plane
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: TalosCluster
+    name: talos-cluster
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: TalosCluster
+metadata:
+  name: talos-cluster
+  namespace: default
+spec:
+  controlPlaneEndpoint:
+    host: "10.4.1.1"
+    port: 6443
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+kind: TalosControlPlane
+metadata:
+  name: talos-control-plane
+  namespace: default
+spec:
+  replicas: 3
+  version: v1.33.4
+  infrastructureTemplate:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: TalosMachineTemplate
+    name: talos-control-plane-template
+  talosConfigSpec:
+    generateType: controlplane
+    talosVersion: v1.10.7
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: TalosMachineTemplate
+metadata:
+  name: talos-control-plane-template
+  namespace: default
+spec:
+  template:
+    spec:
+      talosVersion: v1.10.7
+      installDisk: /dev/sda
+      installImage: ghcr.io/siderolabs/installer:v1.10.7

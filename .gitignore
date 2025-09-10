@@ -1,0 +1,70 @@
+# Multi-Cloud Kubernetes Local .gitignore
+
+# Volume passphrases (security sensitive)
+volumes/nix-volumes/*/*.passphrase
+volumes/nix-volumes/*/mount/
+
+# Log files
+*.log
+volumes/nix-volumes/*/*.log
+
+# PID files
+volumes/nix-volumes/networking/proxy/pids/
+volumes/nix-volumes/networking/proxy/*.pid
+
+# Temporary files
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Node modules (if any)
+node_modules/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Backup files
+*.bak
+*.backup
+
+# Runtime files
+*.pid
+*.sock
+
+# Network interface files (macOS specific)
+bridge-*
+veth-*
+
+# Terraform files (if any)
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Kubernetes secrets
+*-secret.yaml
+*-secrets.yaml
+
+# Certificate files
+*.pem
+*.key
+*.crt
+*.csr
+
+# Configuration files with sensitive data
+*-secrets.conf
+*-keys.conf
+
+# macOS filesystem events
+.fseventsd/

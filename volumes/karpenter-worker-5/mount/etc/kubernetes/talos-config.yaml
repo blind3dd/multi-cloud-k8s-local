@@ -1,0 +1,26 @@
+apiVersion: v1alpha1
+kind: TalosConfig
+metadata:
+  name: karpenter-worker-5
+spec:
+  clusterName: multi-volume-cluster
+  machineType: controlplane
+  kubernetesVersion: v1.28.0
+  controlPlane:
+    endpoint: https://k8s-api.example.com:6443
+  cluster:
+    name: multi-volume-cluster
+    endpoint: https://k8s-api.example.com:6443
+    localAPIServerPort: 6443
+    dnsDomain: cluster.local
+    podSubnet: 10.244.0.0/16
+    serviceSubnet: 10.96.0.0/12
+  machine:
+    install:
+      disk: /dev/sda
+      image: ghcr.io/talos-systems/talos:v1.5.0
+    network:
+      hostname: karpenter-worker-5
+    kubelet:
+      nodeIP: 10.0.0.1
+    files: []

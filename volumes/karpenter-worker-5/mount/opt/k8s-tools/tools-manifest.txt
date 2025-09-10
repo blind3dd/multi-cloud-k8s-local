@@ -1,0 +1,22 @@
+Kubernetes Tools for karpenter-worker-5 (digitalocean, talos)
+================================================
+
+Base Tools:
+- kubectl
+- kubeadm
+- kubelet
+- etcd
+- containerd
+- runc
+- cni
+
+Provider Tools (digitalocean):
+- doctl
+
+Talos Tools:
+- talosctl
+- cosign
+- syft
+
+Karpenter Tools:
+- karpenter

@@ -1,0 +1,31 @@
+# Cilium Configuration for Cross-Cloud Networking
+cluster:
+  name: multi-cloud-cluster
+  id: 1
+
+# Enable cross-cloud pod communication
+ipam:
+  mode: cluster-pool
+  operator:
+    clusterPoolIPv4PodCIDR: "10.0.0.0/8"
+    clusterPoolIPv4MaskSize: 24
+
+# Enable WireGuard for cross-cloud encryption
+encryption:
+  enabled: true
+  type: wireguard
+
+# Enable Hubble for observability
+hubble:
+  enabled: true
+  relay:
+    enabled: true
+  ui:
+    enabled: true
+
+# Cross-cloud service mesh integration
+serviceMesh:
+  integration: istio
+
+# Network policies for cross-cloud security
+policyEnforcementMode: default

@@ -1,0 +1,34 @@
+---
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: cross-cloud-mtls
+  namespace: default
+spec:
+  mtls:
+    mode: STRICT
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-cross-cloud-traffic
+  namespace: default
+spec:
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/*/sa/*"]
+    to:
+    - operation:
+        ports: ["80", "443"]
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: cross-cloud-tls
+  namespace: default
+spec:
+  host: "*.local"
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL

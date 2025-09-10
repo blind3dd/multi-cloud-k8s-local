@@ -1,0 +1,43 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  name: cross-cloud-istio
+  namespace: istio-system
+spec:
+  values:
+    global:
+      meshID: multi-cloud-mesh
+      multiCluster:
+        clusterName: local-cluster
+      network: cross-cloud-network
+  components:
+    ingressGateways:
+    - name: cross-cloud-gateway
+      enabled: true
+      k8s:
+        service:
+          type: LoadBalancer
+          ports:
+          - port: 80
+            targetPort: 8080
+            name: http2
+          - port: 443
+            targetPort: 8443
+            name: https
+    pilot:
+      k8s:
+        env:
+        - name: PILOT_ENABLE_CROSS_CLUSTER_WORKLOAD_ENTRY
+          value: "true"
+        - name: PILOT_ENABLE_WORKLOAD_ENTRY_AUTOREGISTRATION
+          value: "true"
+  meshConfig:
+    defaultConfig:
+      proxyStatsMatcher:
+        inclusionRegexps:
+        - ".*circuit_breakers.*"
+        - ".*upstream_rq_retry.*"
+        - ".*upstream_rq_pending.*"
+        - ".*upstream_rq_timeout.*"
+        - ".*upstream_cx_connect_timeout.*"
+        - ".*upstream_cx_connect_fail.*"

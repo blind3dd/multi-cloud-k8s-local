@@ -1,0 +1,10 @@
+# Network configuration for talos-control-plane-2 (azure provider)
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+    address 10.1.2.2
+    netmask 255.255.255.0
+    gateway 10.1.1.1
+    dns-nameservers 8.8.8.8 8.8.4.4

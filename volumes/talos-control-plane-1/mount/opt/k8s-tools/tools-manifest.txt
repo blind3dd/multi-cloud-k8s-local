@@ -1,0 +1,20 @@
+Kubernetes Tools for talos-control-plane-1 (aws, talos)
+================================================
+
+Base Tools:
+- kubectl
+- kubeadm
+- kubelet
+- etcd
+- containerd
+- runc
+- cni
+
+Provider Tools (aws):
+- awscli2
+- aws-iam-authenticator
+
+Talos Tools:
+- talosctl
+- cosign
+- syft

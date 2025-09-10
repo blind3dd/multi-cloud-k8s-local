@@ -1,0 +1,15 @@
+Kubernetes Tools for etcd-1 (aws, flatcar)
+================================================
+
+Base Tools:
+- kubectl
+- kubeadm
+- kubelet
+- etcd
+- containerd
+- runc
+- cni
+
+Provider Tools (aws):
+- awscli2
+- aws-iam-authenticator

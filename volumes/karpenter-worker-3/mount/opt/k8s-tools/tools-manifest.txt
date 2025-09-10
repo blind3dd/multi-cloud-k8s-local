@@ -1,0 +1,22 @@
+Kubernetes Tools for karpenter-worker-3 (gcp, talos)
+================================================
+
+Base Tools:
+- kubectl
+- kubeadm
+- kubelet
+- etcd
+- containerd
+- runc
+- cni
+
+Provider Tools (gcp):
+- google-cloud-sdk
+
+Talos Tools:
+- talosctl
+- cosign
+- syft
+
+Karpenter Tools:
+- karpenter

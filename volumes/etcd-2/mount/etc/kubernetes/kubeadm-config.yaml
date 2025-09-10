@@ -1,0 +1,11 @@
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: JoinConfiguration
+nodeRegistration:
+  name: etcd-2
+  kubeletExtraArgs:
+    cloud-provider: azure
+discovery:
+  bootstrapToken:
+    apiServerEndpoint: "k8s-api.example.com:6443"
+    token: "abc123.def456ghi789"
+    unsafeSkipCAVerification: true

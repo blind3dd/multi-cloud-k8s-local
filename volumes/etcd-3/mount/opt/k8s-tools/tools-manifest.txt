@@ -1,0 +1,14 @@
+Kubernetes Tools for etcd-3 (gcp, flatcar)
+================================================
+
+Base Tools:
+- kubectl
+- kubeadm
+- kubelet
+- etcd
+- containerd
+- runc
+- cni
+
+Provider Tools (gcp):
+- google-cloud-sdk

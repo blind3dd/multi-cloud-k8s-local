@@ -1,0 +1,46 @@
+# Containerd configuration for talos-control-plane-4
+version = 2
+
+[plugins."io.containerd.grpc.v1.cri"]
+  sandbox_image = "registry.k8s.io/pause:3.9"
+  
+  [plugins."io.containerd.grpc.v1.cri".containerd]
+    snapshotter = "overlayfs"
+    
+    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
+      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+        runtime_type = "io.containerd.runc.v2"
+        
+        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+          SystemdCgroup = true
+          
+      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.talos]
+        runtime_type = "io.containerd.runc.v2"
+        
+        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.talos.options]
+          SystemdCgroup = true
+          BinaryName = "/usr/local/bin/runc"
+          Root = "/run/containerd/runc/talos"
+
+[plugins."io.containerd.grpc.v1.cri".cni]
+  bin_dir = "/opt/cni/bin"
+  conf_dir = "/etc/cni/net.d"
+  conf_template = ""
+
+[plugins."io.containerd.grpc.v1.cri".registry]
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
+    [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
+      endpoint = ["https://registry-1.docker.io"]
+    [plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.k8s.io"]
+      endpoint = ["https://registry.k8s.io"]
+    [plugins."io.containerd.grpc.v1.cri".registry.mirrors."ghcr.io"]
+      endpoint = ["https://ghcr.io"]
+    [plugins."io.containerd.grpc.v1.cri".registry.mirrors."quay.io"]
+      endpoint = ["https://quay.io"]
+
+[plugins."io.containerd.grpc.v1.cri".image_decryption]
+  key_model = "node"
+
+[plugins."io.containerd.grpc.v1.cri".x509_key_pair_streaming]
+  tls_cert_file = "/etc/containerd/ssl/cert.pem"
+  tls_private_key_file = "/etc/containerd/ssl/key.pem"

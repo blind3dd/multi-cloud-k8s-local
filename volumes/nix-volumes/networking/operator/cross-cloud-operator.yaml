@@ -1,0 +1,78 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cross-cloud-operator
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cross-cloud-operator
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "endpoints", "persistentvolumeclaims", "events", "configmaps", "secrets"]
+  verbs: ["*"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "daemonsets", "replicasets", "statefulsets"]
+  verbs: ["*"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses", "networkpolicies"]
+  verbs: ["*"]
+- apiGroups: ["cilium.io"]
+  resources: ["ciliumnetworkpolicies", "ciliumclusterwidenetworkpolicies"]
+  verbs: ["*"]
+- apiGroups: ["networking.istio.io"]
+  resources: ["virtualservices", "destinationrules", "gateways"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cross-cloud-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cross-cloud-operator
+subjects:
+- kind: ServiceAccount
+  name: cross-cloud-operator
+  namespace: kube-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cross-cloud-operator
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cross-cloud-operator
+  template:
+    metadata:
+      labels:
+        app: cross-cloud-operator
+    spec:
+      serviceAccountName: cross-cloud-operator
+      containers:
+      - name: operator
+        image: cross-cloud-operator:latest
+        env:
+        - name: CLUSTER_NAME
+          value: "local-cluster"
+        - name: CLOUD_PROVIDER
+          value: "local"
+        - name: CILIUM_ENABLED
+          value: "true"
+        - name: ISTIO_ENABLED
+          value: "true"
+        - name: WIREGUARD_ENABLED
+          value: "true"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"

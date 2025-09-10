@@ -1,0 +1,80 @@
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  name: gcp-cluster
+  namespace: default
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks: ["10.2.0.0/16"]
+    services:
+      cidrBlocks: ["10.3.0.0/16"]
+  controlPlaneRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    kind: KubeadmControlPlane
+    name: gcp-control-plane
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: GCPCluster
+    name: gcp-cluster
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: GCPCluster
+metadata:
+  name: gcp-cluster
+  namespace: default
+spec:
+  project: my-gcp-project
+  region: us-central1
+  network:
+    name: gcp-cluster-network
+    subnets:
+    - name: gcp-cluster-subnet
+      cidr: "10.2.0.0/24"
+      region: us-central1
+  controlPlaneEndpoint:
+    host: "10.2.1.1"
+    port: 6443
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+kind: KubeadmControlPlane
+metadata:
+  name: gcp-control-plane
+  namespace: default
+spec:
+  replicas: 3
+  version: v1.33.4
+  infrastructureTemplate:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: GCPMachineTemplate
+    name: gcp-control-plane-template
+  kubeadmConfigSpec:
+    clusterConfiguration:
+      apiServer:
+        certSANs:
+        - localhost
+        - 127.0.0.1
+        - 10.2.1.1
+      controlPlaneEndpoint: "10.2.1.1:6443"
+    initConfiguration:
+      nodeRegistration:
+        kubeletExtraArgs:
+          cloud-provider: gce
+    joinConfiguration:
+      nodeRegistration:
+        kubeletExtraArgs:
+          cloud-provider: gce
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: GCPMachineTemplate
+metadata:
+  name: gcp-control-plane-template
+  namespace: default
+spec:
+  template:
+    spec:
+      machineType: e2-medium
+      imageFamily: ubuntu-2004-lts
+      imageProject: ubuntu-os-cloud
+      diskSize: 30
+      diskType: pd-standard

@@ -1,0 +1,14 @@
+Kubernetes Tools for etcd-2 (azure, flatcar)
+================================================
+
+Base Tools:
+- kubectl
+- kubeadm
+- kubelet
+- etcd
+- containerd
+- runc
+- cni
+
+Provider Tools (azure):
+- azure-cli

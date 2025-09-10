@@ -1,0 +1,32 @@
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-cross-cloud-communication
+  namespace: default
+spec:
+  endpointSelector: {}
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: kube-system
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: istio-system
+  - toCIDR:
+    - "10.0.0.0/8"  # Allow cross-cloud pod communication
+  - toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+      - port: "80"
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: deny-all-ingress
+  namespace: default
+spec:
+  endpointSelector: {}
+  ingress: []

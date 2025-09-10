@@ -1,0 +1,22 @@
+Kubernetes Tools for karpenter-worker-4 (ibm, talos)
+================================================
+
+Base Tools:
+- kubectl
+- kubeadm
+- kubelet
+- etcd
+- containerd
+- runc
+- cni
+
+Provider Tools (ibm):
+- ibmcloud-cli
+
+Talos Tools:
+- talosctl
+- cosign
+- syft
+
+Karpenter Tools:
+- karpenter
