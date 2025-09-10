@@ -64,8 +64,11 @@ create_cluster_on_volume() {
             --network ${cluster_name}-network \
             --ip 10.0.1.${ip_suffix} \
             -v ${volume_path}:/data \
-            -v /var/run/docker.sock:/var/run/docker.sock \
             --privileged \
+            --cgroupns=host \
+            --tmpfs /tmp \
+            --tmpfs /run \
+            -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
             kindest/node:v1.33.1 \
             tail -f /dev/null
         
@@ -77,7 +80,8 @@ create_cluster_on_volume() {
             --pod-network-cidr=10.244.0.0/16 \
             --apiserver-advertise-address=10.0.1.${ip_suffix} \
             --control-plane-endpoint=10.0.1.${ip_suffix}:6443 \
-            --ignore-preflight-errors=SystemVerification
+            --ignore-preflight-errors=SystemVerification,FileContent--proc-sys-net-bridge-bridge-nf-call-iptables,Swap,NumCPU \
+            --cri-socket=unix:///var/run/containerd/containerd.sock
         
         echo -e "${GREEN}  ✓ Control plane node created${NC}"
         
