@@ -1,70 +1,32 @@
-# Multi-Cloud Kubernetes Local .gitignore
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars.backup
+*.tfplan
+*.tfplan.*
 
-# Volume passphrases (security sensitive)
-volumes/nix-volumes/*/*.passphrase
-volumes/nix-volumes/*/mount/
-
-# Log files
-*.log
-volumes/nix-volumes/*/*.log
-
-# PID files
-volumes/nix-volumes/networking/proxy/pids/
-volumes/nix-volumes/networking/proxy/*.pid
-
-# Temporary files
-*.tmp
-*.temp
-.DS_Store
-Thumbs.db
-
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-
-# Node modules (if any)
-node_modules/
-
-# IDE files
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# Backup files
-*.bak
-*.backup
+# OS
+.DS_Store
+Thumbs.db
 
-# Runtime files
-*.pid
-*.sock
+# Logs
+*.log
 
-# Network interface files (macOS specific)
-bridge-*
-veth-*
+# Devbox
+devbox*
 
-# Terraform files (if any)
-*.tfstate
-*.tfstate.*
-.terraform/
-.terraform.lock.hcl
-
-# Kubernetes secrets
-*-secret.yaml
-*-secrets.yaml
-
-# Certificate files
-*.pem
-*.key
-*.crt
-*.csr
-
-# Configuration files with sensitive data
-*-secrets.conf
-*-keys.conf
-
-# macOS filesystem events
-.fseventsd/
+# Temporary files
+*.tmp
+*.temp
+key3_private.asc
+new-key-backup.asc
+*.asc
+*volumes
