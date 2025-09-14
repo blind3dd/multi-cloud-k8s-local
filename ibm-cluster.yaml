@@ -1,0 +1,133 @@
+apiVersion: cluster.x-k8s.io/v1beta2
+kind: Cluster
+metadata:
+  name: ibm-cluster
+  namespace: default
+  labels:
+    provider: ibm
+    region: us-south
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks: ["10.6.0.0/16"]
+    services:
+      cidrBlocks: ["10.7.0.0/16"]
+  controlPlaneRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta2
+    kind: KubeadmControlPlane
+    name: ibm-control-plane
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+    kind: DockerCluster
+    name: ibm-cluster
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+kind: DockerCluster
+metadata:
+  name: ibm-cluster
+  namespace: default
+  labels:
+    provider: ibm
+spec: {}
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta2
+kind: KubeadmControlPlane
+metadata:
+  name: ibm-control-plane
+  namespace: default
+  labels:
+    provider: ibm
+spec:
+  replicas: 1
+  version: v1.28.0
+  machineTemplate:
+    infrastructureRef:
+      apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+      kind: DockerMachineTemplate
+      name: ibm-control-plane
+  kubeadmConfigSpec:
+    clusterConfiguration:
+      apiServer:
+        extraArgs:
+          cloud-provider: external
+          etcd-servers: "https://etcd-1:2379,https://etcd-2:2379,https://etcd-3:2379"
+    initConfiguration:
+      nodeRegistration:
+        kubeletExtraArgs:
+          cloud-provider: external
+    joinConfiguration:
+      nodeRegistration:
+        kubeletExtraArgs:
+          cloud-provider: external
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+kind: DockerMachineTemplate
+metadata:
+  name: ibm-control-plane
+  namespace: default
+  labels:
+    provider: ibm
+spec:
+  template:
+    spec:
+      extraMounts:
+      - containerPath: /var/run/docker.sock
+        hostPath: /var/run/docker.sock
+---
+apiVersion: cluster.x-k8s.io/v1beta2
+kind: MachineDeployment
+metadata:
+  name: ibm-workers
+  namespace: default
+  labels:
+    provider: ibm
+spec:
+  replicas: 2
+  clusterName: ibm-cluster
+  selector:
+    matchLabels:
+      cluster.x-k8s.io/cluster-name: ibm-cluster
+  template:
+    metadata:
+      labels:
+        cluster.x-k8s.io/cluster-name: ibm-cluster
+    spec:
+      clusterName: ibm-cluster
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta2
+          kind: KubeadmConfigTemplate
+          name: ibm-workers
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+        kind: DockerMachineTemplate
+        name: ibm-workers
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta2
+kind: KubeadmConfigTemplate
+metadata:
+  name: ibm-workers
+  namespace: default
+  labels:
+    provider: ibm
+spec:
+  template:
+    spec:
+      joinConfiguration:
+        nodeRegistration:
+          kubeletExtraArgs:
+            cloud-provider: external
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+kind: DockerMachineTemplate
+metadata:
+  name: ibm-workers
+  namespace: default
+  labels:
+    provider: ibm
+spec:
+  template:
+    spec:
+      extraMounts:
+      - containerPath: /var/run/docker.sock
+        hostPath: /var/run/docker.sock

@@ -1,0 +1,133 @@
+apiVersion: cluster.x-k8s.io/v1beta2
+kind: Cluster
+metadata:
+  name: aws-cluster
+  namespace: default
+  labels:
+    provider: aws
+    region: us-west-2
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks: ["10.0.0.0/16"]
+    services:
+      cidrBlocks: ["10.1.0.0/16"]
+  controlPlaneRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta2
+    kind: KubeadmControlPlane
+    name: aws-control-plane
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+    kind: DockerCluster
+    name: aws-cluster
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+kind: DockerCluster
+metadata:
+  name: aws-cluster
+  namespace: default
+  labels:
+    provider: aws
+spec: {}
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta2
+kind: KubeadmControlPlane
+metadata:
+  name: aws-control-plane
+  namespace: default
+  labels:
+    provider: aws
+spec:
+  replicas: 1
+  version: v1.28.0
+  machineTemplate:
+    infrastructureRef:
+      apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+      kind: DockerMachineTemplate
+      name: aws-control-plane
+  kubeadmConfigSpec:
+    clusterConfiguration:
+      apiServer:
+        extraArgs:
+          cloud-provider: external
+          etcd-servers: "https://etcd-1:2379,https://etcd-2:2379,https://etcd-3:2379"
+    initConfiguration:
+      nodeRegistration:
+        kubeletExtraArgs:
+          cloud-provider: external
+    joinConfiguration:
+      nodeRegistration:
+        kubeletExtraArgs:
+          cloud-provider: external
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+kind: DockerMachineTemplate
+metadata:
+  name: aws-control-plane
+  namespace: default
+  labels:
+    provider: aws
+spec:
+  template:
+    spec:
+      extraMounts:
+      - containerPath: /var/run/docker.sock
+        hostPath: /var/run/docker.sock
+---
+apiVersion: cluster.x-k8s.io/v1beta2
+kind: MachineDeployment
+metadata:
+  name: aws-workers
+  namespace: default
+  labels:
+    provider: aws
+spec:
+  replicas: 2
+  clusterName: aws-cluster
+  selector:
+    matchLabels:
+      cluster.x-k8s.io/cluster-name: aws-cluster
+  template:
+    metadata:
+      labels:
+        cluster.x-k8s.io/cluster-name: aws-cluster
+    spec:
+      clusterName: aws-cluster
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta2
+          kind: KubeadmConfigTemplate
+          name: aws-workers
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+        kind: DockerMachineTemplate
+        name: aws-workers
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta2
+kind: KubeadmConfigTemplate
+metadata:
+  name: aws-workers
+  namespace: default
+  labels:
+    provider: aws
+spec:
+  template:
+    spec:
+      joinConfiguration:
+        nodeRegistration:
+          kubeletExtraArgs:
+            cloud-provider: external
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta2
+kind: DockerMachineTemplate
+metadata:
+  name: aws-workers
+  namespace: default
+  labels:
+    provider: aws
+spec:
+  template:
+    spec:
+      extraMounts:
+      - containerPath: /var/run/docker.sock
+        hostPath: /var/run/docker.sock
